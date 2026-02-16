@@ -1,0 +1,16 @@
+{
+  "id": "basics",
+  "name": "Shroudtopia Basics",
+  "version": "1.0.0",
+  "shroudtopia": {
+    "default":  {
+            "active": true,
+            "no_stamina_loss": true,
+            "no_fall_damage": true,
+            "inf_item_use": true, 
+            "no_resource_cost": true, 
+            "unlock_blueprints": true, 
+            "inf_item_split": true
+        }
+  }
+}

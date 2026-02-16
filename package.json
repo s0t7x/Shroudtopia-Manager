@@ -1,0 +1,38 @@
+{
+  "name": "shroudtopia-manager",
+  "version": "1.0.0",
+  "description": "Modern Manager for Enshrouded Mods",
+  "main": "src/main.js",
+  "author": "s0t7x",
+  "scripts": {
+    "start": "electron ./src/main.js",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "axios": "^1.6.2",
+    "vdf-parser": "^1.2.1"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.Shroudtopia.manager",
+    "productName": "Shroudtopia Manager",
+    "asar": true,
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "src/app.ico"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "node_modules/**/*"
+    ]
+  }
+}

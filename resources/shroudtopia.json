@@ -1,0 +1,33 @@
+{
+    "active": true,
+    "bootDelay": 3000,
+    "enableLogging": true,
+    "logLevel": "INFO",
+    "mods": {
+        "Flight Mod": {
+            "active": false
+        },
+        "basics": {
+            "active": false,
+            "inf_item_split": false,
+            "inf_item_use": false,
+            "no_fall_damage": true,
+            "no_resource_cost": false,
+            "no_stamina_loss": true,
+            "unlock_blueprints": false
+        },
+        "basics_mod": {
+            "active": true,
+            "inf_item_split": true,
+            "inf_item_use": true,
+            "no_fall_damage": true,
+            "no_resource_cost": true,
+            "no_stamina_loss": true,
+            "unlock_blueprints": true
+        },
+        "flight_mod": {
+            "active": true
+        }
+    },
+    "updateDelay": 500
+}

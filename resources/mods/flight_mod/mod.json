@@ -1,0 +1,10 @@
+{
+  "id": "Flight Mod",
+  "name": "Shroudtopia Glider Flight",
+  "version": "1.0.0",
+  "shroudtopia": {
+    "default":   {
+            "active": true
+        }
+  }
+}

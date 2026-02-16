@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="h-full">
+
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            /* This prevents the 1px bleed at the top */
+            border-top: 1px solid #0f172a;
+        }
+
+        header {
+            /* Ensure the header perfectly covers the top */
+            margin-top: -1px;
+        }
+
+        .drag {
+            -webkit-app-region: drag;
+        }
+
+        .no-drag {
+            -webkit-app-region: no-drag;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .rotate-0 {
+            transform: rotate(0deg);
+        }
+
+        .rotate--90 {
+            transform: rotate(-90deg);
+        }
+
+        /* Optional: prevent text selection while clicking headers */
+        .cursor-pointer {
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body class="bg-[#020617] text-slate-200 h-full flex flex-col overflow-hidden font-sans">
+
+    <header class="drag h-14 bg-slate-900/80 flex items-center justify-between px-6 border-b border-slate-800 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-8">
+                <img src="./app.png" class="w-full h-full object-cover rounded" />
+            </div>
+            <span class="font-black text-sm tracking-widest uppercase">Shroudtopia <span
+                    class="text-cyan-400">Manager</span></span>
+        </div>
+        <div class="no-drag flex items-center gap-1">
+            <!-- Refresh Button -->
+            <button onclick="window.location.reload()"
+                class="p-2 hover:bg-slate-800 rounded-md transition text-slate-400 hover:text-cyan-400"
+                title="Refresh App">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+
+            <button onclick="window.api.windowCtrl('min')" class="p-2 hover:bg-slate-800 rounded-md transition"><svg
+                    class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 12H4" stroke-width="2" />
+                </svg></button>
+            <button onclick="window.api.windowCtrl('close')"
+                class="p-2 hover:bg-red-500/20 hover:text-red-500 rounded-md transition"><svg class="w-4 h-4"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 18L18 6M6 6l12 12" stroke-width="2" />
+                </svg></button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="w-72 bg-slate-900/40 border-r border-slate-800 p-6 flex flex-col gap-4">
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Target Mode</label>
+                <select id="targetSwitcher" onchange="init()"
+                    class="no-drag w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs font-bold text-white outline-none cursor-pointer">
+                    <option value="game">Enshrouded (Client)</option>
+                    <option value="server">Enshrouded (Server)</option>
+                </select>
+            </div>
+
+            <nav id="sidebar-nav" class="flex flex-col gap-1 mt-4">
+                <button onclick="showTab('dash')" data-tab="dash"
+                    class="nav-btn bg-slate-800 p-3 rounded-xl flex items-center gap-3 transition font-bold text-sm">Dashboard</button>
+                <button id="shroudTabBtn" onclick="showTab('shroud-cfg')" data-tab="shroud-cfg"
+                    class="nav-btn hover:bg-slate-800 p-3 rounded-xl flex items-center gap-3 transition opacity-50 pointer-events-none text-sm">Shroudtopia</button>
+                <button id="emlTabBtn" onclick="showTab('eml-cfg')" data-tab="eml-cfg"
+                    class="nav-btn hover:bg-slate-800 p-3 rounded-xl flex items-center gap-3 transition opacity-50 pointer-events-none text-sm">EML
+                    Config</button>
+                <!-- New Server Config Tab -->
+                <button id="serverTabBtn" onclick="showTab('server-cfg')" data-tab="server-cfg"
+                    class="nav-btn hidden hover:bg-slate-800 p-3 rounded-xl flex items-center gap-3 transition text-sm">Server
+                    Settings</button>
+
+                <div class="h-px bg-slate-800 my-4"></div>
+                <button onclick="showTab('settings')" data-tab="settings"
+                    class="nav-btn hover:bg-slate-800 p-3 rounded-xl flex items-center gap-3 transition text-sm">Settings</button>
+            </nav>
+
+            <div class="mt-auto p-4 bg-slate-950/50 border border-slate-800/50 rounded-2xl">
+                <div id="aside-path-display" onclick="openActivePath()"
+                    class="text-[9px] font-mono text-slate-500 truncate cursor-pointer hover:text-cyan-400 hover:underline transition">
+                    No path selected</div>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-10">
+            <!-- DASHBOARD -->
+            <section id="dash" class="tab-content active space-y-8">
+                <div class="flex justify-between items-end">
+                    <h1 class="text-4xl font-black tracking-tight">Dashboard</h1>
+                    <div id="dash-path-display-inactive" onclick="openActivePath()"
+                        class="text-[10px] font-mono text-slate-500 bg-slate-900 px-4 py-2 rounded-full border border-slate-800 cursor-pointer hover:border-cyan-500/50 hover:text-cyan-400 transition ml-auto d-none"
+                        style="opacity: 0">
+                        No path selected</div>
+                    <button onclick="launchTarget()"
+                        class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 px-4 py-2 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 transition-all transform hover:scale-105 active:scale-95"
+                        style="font-size: 75%">
+                        Start <span id="launch-label">Game</span>
+                    </button>
+                </div>
+
+                <!-- Horizontal Loaders -->
+                <div class="space-y-4">
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Mod Loaders</h3>
+                    <div id="loader-status" class="flex flex-row gap-4"></div>
+                </div>
+
+                <!-- Mod Grid -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center px-1">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mods</h3>
+                        <button onclick="importMod()"
+                            class="bg-slate-800 hover:bg-cyan-600 text-white text-[10px] font-black px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 4v16m8-8H4" stroke-width="3" />
+                            </svg>
+                            IMPORT ZIP
+                        </button>
+                    </div>
+                    <!-- Grid: 1 col on mobile, 2 cols on default, 3 on large -->
+                    <div id="mod-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </section>
+
+            <!-- SHROUDTOPIA CONFIG -->
+            <section id="shroud-cfg" class="tab-content space-y-6">
+                <div class="flex justify-between items-center bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
+                    <div>
+                        <h1 class="text-2xl font-black uppercase tracking-tighter">Shroudtopia</h1>
+                        <p class="text-xs text-slate-500">Settings for shroudtopia.json. Changes apply immediatly upon
+                            save.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="toggleEditor('shroud')"
+                            class="text-[10px] font-black text-slate-400 hover:text-cyan-500 uppercase tracking-widest transition">Toggle
+                            Mode</button>
+                        <button onclick="saveConfig('shroudtopia.json')"
+                            class="bg-cyan-600 hover:bg-cyan-500 px-6 py-2 rounded-xl font-bold text-sm transition">Save
+                            Config</button>
+                    </div>
+                </div>
+                <div id="shroud-visual" class="space-y-2"></div>
+                <div id="shroud-raw" class="hidden rounded-3xl overflow-hidden border border-slate-800 shadow-2xl">
+                    <div id="shroud-ace" style="height: 600px"></div>
+                </div>
+            </section>
+
+            <!-- EML CONFIG -->
+            <section id="eml-cfg" class="tab-content space-y-6">
+                <div class="flex justify-between items-center bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
+                    <div>
+                        <h1 class="text-2xl font-black uppercase tracking-tighter">EML</h1>
+                        <p class="text-xs text-slate-500">Settings for eml.json. Changes require a restart to take
+                            effect.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="toggleEditor('eml')"
+                            class="text-[10px] font-black text-slate-400 hover:text-cyan-500 uppercase tracking-widest transition">Toggle
+                            Mode</button>
+                        <button onclick="saveConfig('eml.json')"
+                            class="bg-cyan-600 hover:bg-cyan-500 px-6 py-2 rounded-xl font-bold text-sm transition">Save
+                            Config</button>
+                    </div>
+                </div>
+                <div id="eml-visual" class="space-y-2"></div>
+                <div id="eml-raw" class="hidden rounded-3xl overflow-hidden border border-slate-800 shadow-2xl">
+                    <div id="eml-ace" style="height: 600px"></div>
+                </div>
+            </section>
+
+            <section id="server-cfg" class="tab-content space-y-6">
+                <div class="flex justify-between items-center bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
+                    <div>
+                        <h1 class="text-2xl font-black uppercase tracking-tighter">Server Config</h1>
+                        <p class="text-xs text-slate-500">Settings for enshrouded_server.json. Changes require a restart
+                            to take effect.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="toggleEditor('server')"
+                            class="text-[10px] font-black text-slate-400 hover:text-cyan-500 uppercase tracking-widest transition">Toggle
+                            Mode</button>
+                        <button onclick="saveConfig('enshrouded_server.json')"
+                            class="bg-cyan-600 hover:bg-cyan-500 px-6 py-2 rounded-xl font-bold text-sm transition">Save
+                            Config</button>
+                    </div>
+                </div>
+                <div id="server-visual" class="space-y-2"></div>
+                <div id="server-raw" class="hidden rounded-3xl overflow-hidden border border-slate-800 shadow-2xl">
+                    <div id="server-ace" style="height: 600px"></div>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="settings" class="tab-content space-y-6">
+                <h1 class="text-4xl font-black">Settings</h1>
+                <div class="bg-slate-900/80 p-10 rounded-[40px] border border-slate-800 space-y-8 shadow-2xl">
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Game
+                                Path</label>
+                            <input id="set-game-path" type="text"
+                                class="no-drag w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl text-sm focus:border-cyan-500 outline-none transition">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Server
+                                Path</label>
+                            <input id="set-server-path" type="text"
+                                class="no-drag w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl text-sm focus:border-cyan-500 outline-none transition">
+                        </div>
+
+                    </div>
+                    <div class="pt-6 border-t border-slate-800">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Server
+                            Process Settings (PS1)</h3>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400">Restart Hour (0-23)</label>
+                                <input id="set-server-restart" type="number"
+                                    class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400">Priority Class</label>
+                                <select id="set-server-priority"
+                                    class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+                                    <option value="Normal">Normal</option>
+                                    <option value="AboveNormal">AboveNormal</option>
+                                    <option value="High">High</option>
+                                    <option value="RealTime">RealTime</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400">Affinity Mask</label>
+                                <input id="set-server-affinity" type="number"
+                                    class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <label
+                        class="flex items-center justify-between p-6 bg-slate-950/50 rounded-2xl border border-slate-800 cursor-pointer">
+                        <span class="text-sm font-bold text-slate-300">Start Mod Manager with Windows</span>
+                        <input id="set-windows-start" type="checkbox" class="w-6 h-6 accent-cyan-500">
+                    </label>
+                    <button onclick="saveAppSettings()"
+                        class="w-full bg-cyan-600 hover:bg-cyan-500 p-4 rounded-2xl font-black uppercase tracking-widest transition">Save
+                        & Apply</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>
