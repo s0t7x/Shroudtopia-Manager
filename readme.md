@@ -1,4 +1,6 @@
+<center>
 <img height="250" src="src/app.png" />
+</center>
 
 ![Version](https://img.shields.io/badge/version-1.0.0-cyan?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/platform-windows-blue?style=for-the-badge)
