@@ -1,9 +1,12 @@
-# 🌌 Shroudtopia Manager
+<img height="250" src="src/app.png" />
+
 ![Version](https://img.shields.io/badge/version-1.0.0-cyan?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/platform-windows-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-slate?style=for-the-badge)
 
 **Shroudtopia Manager** is a sleek management solution for **Enshrouded**. Whether you are a player looking for a one-click client setup or a server host needing advanced configurations, Shroudtopia Manager is here to simplify your experience.
+
+![Client](screenshot_client.png)
 
 [**Download Latest Portable EXE**](https://github.com/s0t7x/shroudtopia-manager/releases)
 
@@ -24,24 +27,12 @@
 - **Config UI:** Edit `shroudtopia.json`, `eml.json`, and `enshrouded_server.json` using a clean, nested visual interface.
 - **Raw JSON Mode:** Switch to a full-featured **Ace Editor** for manual JSON tweaking.
 
-### 🚀 Pro Server Startup
+### 🚀 Server Startup
 - **Automated Start Script:** Generates a custom PowerShell monitor that handles:
     - **CPU Affinity:** Pin your server to specific cores for better performance.
     - **Process Priority:** Ensure the server gets CPU time (High/RealTime).
     - **Auto-Restart:** Scheduled (configurable) restarts to keep the server fresh.
     - **Crash Recovery:** Automatically restarts the server if it closes or crashes.
-
----
-
-## 📸 Screenshots
-
-| Client Dashboard | Server Configuration |
-| :---: | :---: |
-| ![Client](screenshot_client.png) | ![Server Config](screenshot_server_config.png) |
-
-| Shroudtopia Settings |
-| :---: |
-| ![Shroudtopia Config](screenshot_st_config.png) |
 
 ---
 
