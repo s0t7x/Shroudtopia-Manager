@@ -40,7 +40,7 @@
 
 ## 🚀 Quick Start
 
-1. **Download:** Grab the `Shroudtopia-Manager-Portable.exe` from the [Releases](https://github.com/s0t7x/shroudtopia-manager/releases) page.
+1. **Download:** Grab the `Shroudtopia.Manager.x.y.z.exe` from the [Releases](https://github.com/s0t7x/shroudtopia-manager/releases) page.
 2. **Setup Paths:** On first launch, verify your Game and Server paths in the **Settings** tab.
 3. **Install Loaders:** Go to the Dashboard and click **Install** on the mod loaders you wish to use.
 4. **Add Mods:** Use the **Import ZIP** button to add your favorite mods.
