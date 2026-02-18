@@ -13,4 +13,7 @@ contextBridge.exposeInMainWorld('api', {
     windowCtrl: (action) => ipcRenderer.invoke('window-ctrl', action),
     openPath: (path) => ipcRenderer.invoke('open-path', path),
     launchTarget: (p) => ipcRenderer.invoke('launch-target', p),
+    getSavegames: (paths) => ipcRenderer.invoke('get-savegames', paths),
+    transferSave: (payload) => ipcRenderer.invoke('transfer-save', payload),
+    setActiveWorld: (payload) => ipcRenderer.invoke('set-active-world', payload),
 });
